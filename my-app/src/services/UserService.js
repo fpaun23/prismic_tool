@@ -44,6 +44,11 @@ export async function generate(action = "", localeFrom = "", localeTo = "", repo
     return await response.json();
 }
 
+export async function getSubset(action = "", localeFrom = "", localeTo = "", repo = "") {        
+    const response = await fetch('/subset?action=' + action + "&localeFrom=" + localeFrom + "&localeTo=" + localeTo + "&repo=" + repo);  
+    return await response.json();
+}
+
 export async function makeArchive(folder) { 
     const response = await fetch('/zip?folder=' + folder);  
     return await response.json();

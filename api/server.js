@@ -1,3 +1,4 @@
+var fs = require('fs');
 const app = require('./config');
 const express = require('express');
 const PrismicConfig = require('./prismic-configuration');
@@ -10,6 +11,7 @@ const utilsExportNavigation = require('./utils/exportNavigation');
 const utilsExportHomepages = require('./utils/exportHomepages');
 const utilsExportBulk = require('./utils/exportBulk');
 const utilsExportBulkCrossRepo = require('./utils/exportBulkCrossRepo');
+const utilsExportSubsetCrossRepo = require('./utils/exportSubsetCrossRepo');
 const zipper = require('zip-local');
 const path = require('path');
 /*
@@ -206,6 +208,47 @@ app.get('/generate', async function (req, res) {
 
   }
   res.json("archive");    
+});
+
+//temporary - must be moved to a utility file
+app.get('/subset', async function (req, res) {  
+
+  if (req.query.localeFrom == '') { res.json([]); }
+
+  fs.readdir('exports_subset_cross_repo/bulk', (err, files) => { 
+    if (err) { 
+        console.log(err);
+        res.json([]);
+    }
+    else { 
+        //console.log(files);
+        let response = [];         
+        let total = 0; 
+        
+        for (let i=0; i<files.length; i++) {
+            const data = fs.readFileSync(
+                'exports_subset_cross_repo/bulk/' + files[i], 
+                {
+                    encoding:'utf8', 
+                    flag:'r'
+                }); 
+
+            const json_file = JSON.parse(data)                
+            
+            if (json_file.lang == req.query.localeFrom) {                
+                
+                if (json_file.hasOwnProperty("uid")) {
+                    total++;                  
+                    response.push(
+                        { value: json_file.uid, label: json_file.name[0].content.text },
+                    )
+                }                 
+            }         
+        }
+      res.json(response);         
+    } 
+  }) 
+  
 });
 
 app.get('/duplicateContent', function (req, res) {  

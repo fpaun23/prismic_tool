@@ -16,7 +16,11 @@ const GeneratePrismicContent = ({
         isDisabledProvidersSelect,
         validate,
         show,
-        actionsOptions        
+        actionsOptions,
+        subsetOptions,
+        setSelectedSubset,
+        isDisabledSubsetSelect
+
     }) => {   
         
     const optionsPrismicRepos = [
@@ -74,6 +78,10 @@ const GeneratePrismicContent = ({
 
     const handleProvidersSelection =  (providers) => {
         setSelectedProviders(providers)
+    }
+
+    const handleSubsetSelection =  (subset) => {
+        setSelectedSubset(subset)
     }
 
     const handleCustomTypeSelection =  (customType) => {
@@ -165,6 +173,20 @@ const GeneratePrismicContent = ({
                                     providers={providers}
                                     handleProvidersSelection={handleProvidersSelection}
                                     isDisabled={isDisabledProvidersSelect}
+                                >
+                                </Selectormulti>
+                            </div>
+                        </div>
+                    )}
+
+                    {show.subset && (
+                        <div className="row">
+                            <div className="form-group col-md-12">
+                                <label htmlFor="exampleInputEmail1">Subset</label>
+                                <Selectormulti
+                                    options={subsetOptions}
+                                    handleOptionSelect={handleSubsetSelection}
+                                    isDisabled={isDisabledSubsetSelect}
                                 >
                                 </Selectormulti>
                             </div>

@@ -12,8 +12,8 @@ class Selectormulti extends React.Component {
   
   handleChange = selectedOption => {
     this.setState({ selectedOption });    
-    const providersIds = selectedOption.map(p => p.value) 
-    this.props.handleProvidersSelection(providersIds)   
+    const ids = selectedOption.map(p => p.value) 
+    this.props.handleOptionSelect(ids)   
     console.log(`Multi Option selected:`, selectedOption);
   };
 
@@ -25,7 +25,7 @@ class Selectormulti extends React.Component {
         closeMenuOnSelect={false}
         components={animatedComponents}      
         isMulti
-        options={this.props.providers}
+        options={this.props.options}
         onChange={this.handleChange}
       />
     );
