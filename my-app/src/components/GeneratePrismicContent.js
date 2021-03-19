@@ -15,9 +15,10 @@ const GeneratePrismicContent = ({
         setSelectedCustomType,
         isDisabledProvidersSelect,
         validate,
-        show,        
+        show,
+        actionsOptions        
     }) => {   
-    
+        
     const optionsPrismicRepos = [
         //{ value: 'dev', label: 'https://fanduel-casino-dev.prismic.io/api/v2' },
         //{ value: 'prod', label: 'https://fanduel-casino.prismic.io/api/v2' },
@@ -47,6 +48,7 @@ const GeneratePrismicContent = ({
         { value: 'fq-pa', label: 'Fanduel QA - PA' },
         { value: 'sq-nj', label: 'Stardust QA - NJ' },
         { value: 'sq-pa', label: 'Stardust QA - PA' },
+        { value: 'dv-dv', label: 'Dev' },
       ]; 
 
       const optionsActions = [
@@ -105,7 +107,7 @@ const GeneratePrismicContent = ({
                                 <label htmlFor="exampleInputEmail1">Action {validate.action == false && <span class="mandatory-error">(*)</span> } </label>
                                 <Selector 
                                     type="repo" 
-                                    options={optionsActions}
+                                    options={typeof actionsOptions != 'undefined' ? actionsOptions : optionsActions}
                                     handleRepoSelection={handleActionSelection}
                                 >
                                 </Selector>

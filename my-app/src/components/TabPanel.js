@@ -8,6 +8,7 @@ import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
 import ExportImport from './ExportImport';
 import DuplicateContent from './DuplicateContent';
+import DuplicateContentCrossRepo from './DuplicateContentCrossRepo';
 import BetfairplazaCsv from './BetfairplazaCsv';
 
 function TabPanel(props) {
@@ -22,9 +23,11 @@ function TabPanel(props) {
       {...other}
     >
       {value === index && (
-        <Box p={3}>
-          <Typography>{children}</Typography>
-        </Box>
+        <div>
+          <Box p={0}>
+            <Typography>{children}</Typography>
+          </Box>         
+        </div>
       )}
     </div>
   );
@@ -63,15 +66,19 @@ export default function SimpleTabs() {
       <AppBar position="static">
         <Tabs value={value} onChange={handleChange} aria-label="simple tabs example">
           <Tab label="Manage Prismic Content" {...a11yProps(0)} />                    
+          <Tab label="Cross Repo Bulk Duplicate" {...a11yProps(1)} />
         </Tabs>
       </AppBar>
       <TabPanel value={value} index={0}>
         <DuplicateContent></DuplicateContent>
       </TabPanel>
       <TabPanel value={value} index={1}>
-        <ExportImport></ExportImport>
+        <DuplicateContentCrossRepo></DuplicateContentCrossRepo>
       </TabPanel>
       <TabPanel value={value} index={2}>
+        <ExportImport></ExportImport>
+      </TabPanel>
+      <TabPanel value={value} index={3}>
         <BetfairplazaCsv></BetfairplazaCsv>
       </TabPanel>     
     </div>

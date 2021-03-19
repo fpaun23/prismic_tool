@@ -30,6 +30,11 @@ const changeFilename = (filename = "", grouplang = "", locale = "") => {
   return changedFilename;
 }
 
+const changeFilename2 = (v) => {
+  
+  return changedFilename = "t_" + v + '.json';
+}
+
 const makeArchive = async (folder = "", archiveName = "archive", iterations = 1) => {
       
   if (folder != "") {
@@ -72,5 +77,6 @@ module.exports = {
     createFolder,
     makeArchive,
     changeFilename,
-    removeFile    
+    removeFile,
+    changeFilename2    
 };

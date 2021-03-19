@@ -9,6 +9,7 @@ const utilsExportZones = require('./utils/exportZones');
 const utilsExportNavigation = require('./utils/exportNavigation');
 const utilsExportHomepages = require('./utils/exportHomepages');
 const utilsExportBulk = require('./utils/exportBulk');
+const utilsExportBulkCrossRepo = require('./utils/exportBulkCrossRepo');
 const zipper = require('zip-local');
 const path = require('path');
 /*
@@ -182,7 +183,7 @@ app.get('/zip', async function (req, res) {
 });
 */
 app.get('/generate', async function (req, res) {  
- 
+  console.log(req.query);
   if (req.query.action != "") {
 
     switch (req.query.action) {
@@ -193,6 +194,12 @@ app.get('/generate', async function (req, res) {
       case 'update':
           response = await utilsExportBulk.updateContent(req.query.localeFrom, req.query.localeTo); 
         break;
+      case 'generate_cross_repo':
+          response = await utilsExportBulkCrossRepo.duplicateContent(req.query.localeFrom, req.query.localeTo); 
+        break;
+      case 'update_cross_repo':
+          response = await utilsExportBulkCrossRepo.updateContent(req.query.localeFrom, req.query.localeTo); 
+        break;        
       default:
         break;    
     }
