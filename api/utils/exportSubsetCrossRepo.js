@@ -27,7 +27,7 @@ fs.readFileAsync = function(filename, enc) {
 };
 
 fs.writeFileAsync = function(filename, data) {
-    fs.writeFile('exports_bulk_cross_repo/locale/en-us/'+filename, data, (err) => {
+    fs.writeFile('exports_subset_cross_repo/locale/en-us/'+filename, data, (err) => {
         if (err) throw err;
         console.log('The file has been saved!');
       });
@@ -79,9 +79,10 @@ const mapUid = (uidSource, uidTarget) => {
     return mappedUid;
 }
 
-const duplicateContent = async (sourceLocale = 'en-us', targetLocale = 'en-us') => {
-    console.log("DUPLICATE....")
-    console.log(sourceLocale);
+const duplicateContent = async (sourceLocale = 'en-us', targetLocale = 'en-us', subset = []) => {
+    console.log("DUPLICATE SUBSET....")
+    console.log(sourceLocale);    
+    
     //targetLocale = 'ro-hk';
     //sourceLocale = 'en-us';
 
@@ -92,20 +93,20 @@ const duplicateContent = async (sourceLocale = 'en-us', targetLocale = 'en-us') 
       
     let arrFilenames = [];
 
-    await utilsFolders.emptyFolder('exports_bulk_cross_repo/locale');
+    await utilsFolders.emptyFolder('exports_subset_cross_repo/locale');
     await utilsFolders.emptyFolder('exports_zip');
     
-    await utilsFolders.createFolder('exports_bulk_cross_repo/mapping');
-    await utilsFolders.createFolder('exports_bulk_cross_repo/locale/target');    
-    await utilsFolders.createFolder('exports_bulk_cross_repo/locale/source');
-    //await utilsFolders.createFolder('exports_bulk_cross_repo/locale/mapping');
-    await utilsFolders.createFolder('exports_bulk_cross_repo/locale/to_zip');
+    await utilsFolders.createFolder('exports_subset_cross_repo/mapping');
+    await utilsFolders.createFolder('exports_subset_cross_repo/locale/target');    
+    await utilsFolders.createFolder('exports_subset_cross_repo/locale/source');
+    //await utilsFolders.createFolder('exports_subset_cross_repo/locale/mapping');
+    await utilsFolders.createFolder('exports_subset_cross_repo/locale/to_zip');
 
-    await utilsFolders.removeFile('exports_bulk_cross_repo/mapping/uid_source.json')
+    await utilsFolders.removeFile('exports_subset_cross_repo/mapping/uid_source.json')
   
     
     // read all json files in the directory, filter out those needed to process, and using Promise.all to time when all async readFiles has completed. 
-    fs.readdirAsync('./exports_bulk_cross_repo/bulk').then(function (filenames){   
+    fs.readdirAsync('./exports_subset_cross_repo/bulk').then(function (filenames){   
         
         arrFilenames = filenames
 
@@ -134,12 +135,12 @@ const duplicateContent = async (sourceLocale = 'en-us', targetLocale = 'en-us') 
 
     }).then(async function(r){
         let v = -1;
-        let nbFiles = -1;
+        let nbFiles = 0;
 
         console.log(r.length)
         
         for(let y=1; y<=Math.ceil(r.length / 200); y++) {
-            await utilsFolders.createFolder('exports_bulk_cross_repo/locale/to_zip/' + y);    
+            await utilsFolders.createFolder('exports_subset_cross_repo/locale/to_zip/' + y);    
         }
 
         
@@ -147,50 +148,52 @@ const duplicateContent = async (sourceLocale = 'en-us', targetLocale = 'en-us') 
 
             v = v+1;
 
-            arrUid_source.push(getMappingObj(a.uid, a.type, arrTargetLocaleFiles[v]));
+            arrUid_source.push(getMappingObj(a.uid, a.type, arrTargetLocaleFiles[v]));            
+            if (subset.includes(a.uid)) {
+                const fName = utilsFolders.changeFilename2(v);
+                console.log(a.uid);
+                if (fName != "") {
 
-            const fName = utilsFolders.changeFilename2(v);
-
-            if (fName != "") {
-
-                nbFiles++;                
-                
-                fs.writeFile('exports_bulk_cross_repo/locale/target/' + fName, JSON.stringify(a, null, 2), (err) => {
-                    if (err) throw err;
+                    nbFiles++;                
                     
-                });  
-
-                //used for debugging and development
-                fs.writeFile('exports_bulk_cross_repo/locale/source/' + arrTargetLocaleFiles[v], JSON.stringify(a, null, 2), (err) => {
-                    if (!err) {}
-                                        
-                });  
-
-                const subfolderTo_Zip = Math.trunc(v/200) +1;
+                    fs.writeFile('exports_subset_cross_repo/locale/target/' + fName, JSON.stringify(a, null, 2), (err) => {
+                        if (err) throw err;
                         
-                fs.writeFile('exports_bulk_cross_repo/locale/to_zip/' + subfolderTo_Zip + "/" + fName, JSON.stringify(a, null, 2), (err) => {
-                    if (err) throw err;
-                    //console.log('The file has been saved!');
-                });  
+                    });  
+
+                    //used for debugging and development
+                    fs.writeFile('exports_subset_cross_repo/locale/source/' + arrTargetLocaleFiles[v], JSON.stringify(a, null, 2), (err) => {
+                        if (!err) {}
+                                            
+                    });  
+
+                    const subfolderTo_Zip = Math.trunc(subset.length/200) +1;
+                            
+                    fs.writeFile('exports_subset_cross_repo/locale/to_zip/' + subfolderTo_Zip + "/" + fName, JSON.stringify(a, null, 2), (err) => {
+                        if (err) throw err;
+                        //console.log('The file has been saved!');
+                    });  
+                }
             }
-        
             
         })
+
         return nbFiles;
+        
     }).then(async function(v){
 
         console.log("A total of : " + v)
         console.log("arrUid_source:", arrUid_source.length)
         console.log("Creating uid_source.json file...")
 
-        fs.writeFile('exports_bulk_cross_repo/mapping/uid_source.json',  JSON.stringify(arrUid_source, null, 2), (err) => {
+        fs.writeFile('exports_subset_cross_repo/mapping/uid_source.json',  JSON.stringify(arrUid_source, null, 2), (err) => {
             if (err) throw err;
             //console.log('The file has been saved!');            
         });
 
         const totalSubfoldersTo_Zip = Math.ceil(v / 200);        
 
-        const results = await utilsFolders.makeArchive('exports_bulk_cross_repo/locale/to_zip', "archive", totalSubfoldersTo_Zip);
+        const results = await utilsFolders.makeArchive('exports_subset_cross_repo/locale/to_zip', "archive", totalSubfoldersTo_Zip);
 
         return results;
         
@@ -204,9 +207,10 @@ const duplicateContent = async (sourceLocale = 'en-us', targetLocale = 'en-us') 
 **********************************************************************
 */
 
-const updateContent = async (sourceLocale = 'en-us', targetLocale = 'en-us') => {
-    console.log("UPDATING....")
+const updateContent = async (sourceLocale = 'en-us', targetLocale = 'en-us', subset = []) => {
+    console.log("UPDATING SUBSET....")
     console.log(sourceLocale);
+    console.log(typeof subset);
     //targetLocale = 'ro-hk';
     //sourceLocale = 'en-us';
 
@@ -216,24 +220,24 @@ const updateContent = async (sourceLocale = 'en-us', targetLocale = 'en-us') => 
       
     let arrFilenames = [];
 
-    await utilsFolders.emptyFolder('exports_bulk_cross_repo/locale');
+    await utilsFolders.emptyFolder('exports_subset_cross_repo/locale');
     await utilsFolders.emptyFolder('exports_zip');
     
-    await utilsFolders.createFolder('exports_bulk_cross_repo/locale/target');    
-    await utilsFolders.createFolder('exports_bulk_cross_repo/locale/source');
-    await utilsFolders.createFolder('exports_bulk_cross_repo/locale/to_zip');
+    await utilsFolders.createFolder('exports_subset_cross_repo/locale/target');    
+    await utilsFolders.createFolder('exports_subset_cross_repo/locale/source');
+    await utilsFolders.createFolder('exports_subset_cross_repo/locale/to_zip');
 
-    await utilsFolders.removeFile('exports_bulk_cross_repo/mapping/uid_target.json')    
-    await utilsFolders.removeFile('exports_bulk_cross_repo/mapping/mapped.json')
+    await utilsFolders.removeFile('exports_subset_cross_repo/mapping/uid_target.json')    
+    await utilsFolders.removeFile('exports_subset_cross_repo/mapping/mapped.json')
     
     // read all json files in the directory, filter out those needed to process, and using Promise.all to time when all async readFiles has completed. 
-    fs.readdirAsync('./exports_bulk_cross_repo/bulk').then(function (filenames) {   
+    fs.readdirAsync('./exports_subset_cross_repo/bulk').then(function (filenames) {   
         
         arrFilenames = filenames
 
         return Promise.all(filenames.map(getFile));
         
-    }).then(function (files){        
+    }).then(function (files) {        
         let i = -1;
         files.forEach(function(file) {
             i = i + 1;
@@ -256,43 +260,32 @@ const updateContent = async (sourceLocale = 'en-us', targetLocale = 'en-us') => 
     }).then(async function(r){
         let v = -1;        
 
-        console.log(r.length)        
-        
-        for(let y=1; y<=Math.ceil(r.length / 200); y++) {
-            await utilsFolders.createFolder('exports_bulk_cross_repo/locale/to_zip/' + y);    
-        }
+        console.log(r.length)           
         
         arrTargetLocale.forEach(a => {
 
             v = v+1;            
-            
+                        
             arrUid_target.push(getMappingObj(a.uid, a.type, arrTargetLocaleFiles[v]));    
 
-            fs.writeFile('exports_bulk_cross_repo/locale/source/' + arrTargetLocaleFiles[v], JSON.stringify(a, null, 2), (err) => {
-                if (!err) {}                              
-            });  
-
-            /*
-            const subfolderTo_Zip = Math.trunc(v/200) +1;
-              
-            
-            fs.writeFile('exports_bulk_cross_repo/locale/to_zip/' + subfolderTo_Zip + "/" + arrTargetLocaleFiles[v], JSON.stringify(a, null, 2), (err) => {
+            fs.writeFile('exports_subset_cross_repo/mapping/uid_target.json',  JSON.stringify(arrUid_target, null, 2), (err) => {
                 if (err) throw err;
-                //console.log('The file has been saved!');
-            });          
-            */
+                //console.log('The file has been saved!');            
+            });
+
+            
+            if (subset.indexOf("cash-noire-ant1") > 0) {
+                fs.writeFile('exports_subset_cross_repo/locale/source/' + arrTargetLocaleFiles[v], JSON.stringify(a, null, 2), (err) => {
+                    if (!err) {}                              
+                });  
+            }
             
             
         })
-
-        //console.log("arrUid_target:", arrUid_target)
-        //console.log("arrUid_target:", arrUid_target.length)
-
-        
-        fs.writeFile('exports_bulk_cross_repo/mapping/uid_target.json',  JSON.stringify(arrUid_target, null, 2), (err) => {
-            if (err) throw err;
-            //console.log('The file has been saved!');            
-        });
+             
+        for(let y=1; y<=Math.ceil(subset.length / 200); y++) {
+            await utilsFolders.createFolder('exports_subset_cross_repo/locale/to_zip/' + y);    
+        }
 
         return v;
 
@@ -300,11 +293,11 @@ const updateContent = async (sourceLocale = 'en-us', targetLocale = 'en-us') => 
              
         console.log("A total of : " + v)
        
-        const uidSource = require('../exports_bulk_cross_repo/mapping/uid_source.json')        
+        const uidSource = require('../exports_subset_cross_repo/mapping/uid_source.json')        
 
         const mappedUidArr = mapUid(uidSource, arrUid_target);
        
-        fs.writeFile('exports_bulk_cross_repo/mapping/mapped.json',  JSON.stringify(mappedUidArr, null, 2), (err) => {
+        fs.writeFile('exports_subset_cross_repo/mapping/mapped.json',  JSON.stringify(mappedUidArr, null, 2), (err) => {
             if (err) throw err;
             //console.log('The file has been saved!');            
         });
@@ -314,7 +307,7 @@ const updateContent = async (sourceLocale = 'en-us', targetLocale = 'en-us') => 
         /*      
         const totalSubfoldersTo_Zip = Math.ceil(v / 200);        
 
-        const results = await utilsFolders.makeArchive('exports_bulk_cross_repo/locale/to_zip', "archive", totalSubfoldersTo_Zip);
+        const results = await utilsFolders.makeArchive('exports_subset_cross_repo/locale/to_zip', "archive", totalSubfoldersTo_Zip);
 
         return results;
         */
@@ -322,51 +315,45 @@ const updateContent = async (sourceLocale = 'en-us', targetLocale = 'en-us') => 
         // read all json files from the source folder, update the ids, and save the updated version of the file in the target folder
         let sourceFilenames = [];
 
-        fs.readdirAsync('./exports_bulk_cross_repo/locale/source').then(function (filenames) {               
+        fs.readdirAsync('./exports_subset_cross_repo/locale/source').then(function (filenames) {               
 
             sourceFilenames = filenames;            
             return Promise.all(filenames.map(getFile));
 
         }).then(function(files) {            
-            let i = -1;
+            let i = 0;
+
             files.forEach(function(file) {
 
-                i = i + 1;                         
-                
                 let json_file = JSON.parse(file);
                 //if (json_file.uid == 'arcade-logged-out-users-homepage1') {
                 //if (json_file.type == 'product') {
                     console.log(sourceFilenames[i]);
                     const updatedFile = parser.updateFileContent(json_file, mappedUidArr)
                     //console.log(updatedFile);
-                    fs.writeFile('exports_bulk_cross_repo/locale/target/' + sourceFilenames[i], JSON.stringify(updatedFile, null, 2), (err) => {
+                    fs.writeFile('exports_subset_cross_repo/locale/target/' + sourceFilenames[i], JSON.stringify(updatedFile, null, 2), (err) => {
                         if (!err) {}                              
                     }); 
 
                     const subfolderTo_Zip = Math.trunc(i/200) +1;
                         
-                     fs.writeFile('exports_bulk_cross_repo/locale/to_zip/' + subfolderTo_Zip + "/" + sourceFilenames[i], JSON.stringify(updatedFile, null, 2), (err) => {
+                     fs.writeFile('exports_subset_cross_repo/locale/to_zip/' + subfolderTo_Zip + "/" + sourceFilenames[i], JSON.stringify(updatedFile, null, 2), (err) => {
                         if (err) throw err;
                         //console.log('The file has been saved!');
                     });  
 
-                //}
-                
-                /*
-                fs.writeFile('exports_bulk_cross_repo/locale/target/' + arrTargetLocaleFiles[i], JSON.stringify(a, null, 2), (err) => {
-                    if (!err) {}                              
-                }); 
-                */
-                
+                i = i + 1;                         
+                  
             });        
     
-            return i;
+        return i;
+
         }).then(async function(r) {
             console.log("total: ", r);
 
             const totalSubfoldersTo_Zip = Math.ceil(r / 200);        
 
-            const results = await utilsFolders.makeArchive('exports_bulk_cross_repo/locale/to_zip', "archive", totalSubfoldersTo_Zip);
+            const results = await utilsFolders.makeArchive('exports_subset_cross_repo/locale/to_zip', "archive", totalSubfoldersTo_Zip);
 
             return totalSubfoldersTo_Zip;
         });

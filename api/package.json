@@ -27,6 +27,7 @@
     "pug": "~2.0.0-rc.2",
     "request": "~2.83.0",
     "serve-favicon": "~2.4.3",
+    "underscore": "^1.12.1",
     "zip-local": "^0.3.4"
   },
   "devDependencies": {

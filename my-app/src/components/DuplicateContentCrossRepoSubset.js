@@ -13,14 +13,9 @@ const download = require("downloadjs");
 //"proxy": "http://node-api:3080",
 
 const actionsOptions = [
-  { value: 'generate_cross_repo', label: 'Generate Cross >> from Source to Target Locale' },
-  { value: 'update_cross_repo', label: 'Update Cross >> to Source Locale' },
-];      
-
-const subset = [
-    { value: 'one-1', label: 'One' },
-    { value: 'two-2', label: 'Two' },
-  ]; 
+  { value: 'generate_cross_repo_subset', label: 'Generate Cross >> from Source to Target Locale' },
+  { value: 'update_cross_repo_subset', label: 'Update Cross >> to Source Locale' },
+];
 
 class DuplicateContentCrossRepoSubset extends Component {
 
@@ -52,10 +47,10 @@ class DuplicateContentCrossRepoSubset extends Component {
     
     switch (this.state.action) {
 
-      case "generate_cross_repo":
+      case "generate_cross_repo_subset":
         this.generate();
         break;
-      case "update_cross_repo":
+      case "update_cross_repo_subset":
         this.generate();
         break;      
       default:
@@ -69,14 +64,16 @@ class DuplicateContentCrossRepoSubset extends Component {
   }
 
   generate = async () => {
-    /*
+    console.log(this.state.action)
+    console.log(this.state.subset)
+    
     this.setState({ disabled: true });
 
-    const response = await generate(this.state.action, this.state.localeFrom, this.state.localeTo, this.state.repo); 
+    const response = await generate(this.state.action, this.state.localeFrom, this.state.localeTo, this.state.repo, this.state.subset); 
 
     this.setState({ zipFile: response })
     this.setState({ disabled: false });
-    */
+    
   }
 
   validate = (field, status) => {

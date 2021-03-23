@@ -182,13 +182,13 @@ const GeneratePrismicContent = ({
                     {show.subset && (
                         <div className="row">
                             <div className="form-group col-md-12">
-                                <label htmlFor="exampleInputEmail1">Subset</label>
+                                <label htmlFor="exampleInputEmail1">Subset (nb. of documents: {subsetOptions.length})</label>
                                 <Selectormulti
                                     options={subsetOptions}
                                     handleOptionSelect={handleSubsetSelection}
                                     isDisabled={isDisabledSubsetSelect}
                                 >
-                                </Selectormulti>
+                                </Selectormulti> 
                             </div>
                         </div>
                     )}

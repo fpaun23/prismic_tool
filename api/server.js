@@ -14,6 +14,7 @@ const utilsExportBulkCrossRepo = require('./utils/exportBulkCrossRepo');
 const utilsExportSubsetCrossRepo = require('./utils/exportSubsetCrossRepo');
 const zipper = require('zip-local');
 const path = require('path');
+const _ = require('underscore');
 /*
 const app = express(),
       bodyParser = require("body-parser");
@@ -201,7 +202,13 @@ app.get('/generate', async function (req, res) {
         break;
       case 'update_cross_repo':
           response = await utilsExportBulkCrossRepo.updateContent(req.query.localeFrom, req.query.localeTo); 
-        break;        
+        break;
+        case 'generate_cross_repo_subset':
+          response = await utilsExportSubsetCrossRepo.duplicateContent(req.query.localeFrom, req.query.localeTo, req.query.subset); 
+        break;          
+        case 'update_cross_repo_subset':
+          response = await utilsExportSubsetCrossRepo.updateContent(req.query.localeFrom, req.query.localeTo, req.query.subset); 
+      break;          
       default:
         break;    
     }
@@ -240,12 +247,14 @@ app.get('/subset', async function (req, res) {
                 if (json_file.hasOwnProperty("uid")) {
                     total++;                  
                     response.push(
-                        { value: json_file.uid, label: json_file.name[0].content.text },
+                        { value: json_file.uid, label: json_file.name[0].content.text + " (" + json_file.uid + "/" + json_file.type + ")", type: json_file.type },
                     )
                 }                 
             }         
         }
-      res.json(response);         
+
+      const sortedObjs = _.sortBy( response, 'type' );
+      res.json(sortedObjs);         
     } 
   }) 
   
