@@ -119,7 +119,7 @@ class DuplicateContentCrossRepoSubset extends Component {
 
     switch (action.value) {      
 
-      case "update":
+      case "update_cross_repo_subset":
         showToLocale = false;
         showRepo = false;
         this.setState({ repo: "" })

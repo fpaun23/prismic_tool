@@ -210,10 +210,7 @@ const duplicateContent = async (sourceLocale = 'en-us', targetLocale = 'en-us', 
 const updateContent = async (sourceLocale = 'en-us', targetLocale = 'en-us', subset = []) => {
     console.log("UPDATING SUBSET....")
     console.log(sourceLocale);
-    console.log(typeof subset);
-    //targetLocale = 'ro-hk';
-    //sourceLocale = 'en-us';
-
+    
     let arrUid_target = [];
     let arrTargetLocale = [];
     let arrTargetLocaleFiles = [];    
@@ -273,8 +270,8 @@ const updateContent = async (sourceLocale = 'en-us', targetLocale = 'en-us', sub
                 //console.log('The file has been saved!');            
             });
 
-            
-            if (subset.indexOf("cash-noire-ant1") > 0) {
+            const selectedSubsetUids = JSON.parse(subset);
+            if (selectedSubsetUids.includes(a.uid)) {
                 fs.writeFile('exports_subset_cross_repo/locale/source/' + arrTargetLocaleFiles[v], JSON.stringify(a, null, 2), (err) => {
                     if (!err) {}                              
                 });  
@@ -287,11 +284,11 @@ const updateContent = async (sourceLocale = 'en-us', targetLocale = 'en-us', sub
             await utilsFolders.createFolder('exports_subset_cross_repo/locale/to_zip/' + y);    
         }
 
-        return v;
+        return subset;
 
     }).then(function(v) {
              
-        console.log("A total of : " + v)
+        console.log("A total of : " + v.length)
        
         const uidSource = require('../exports_subset_cross_repo/mapping/uid_source.json')        
 
