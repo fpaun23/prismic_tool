@@ -35,7 +35,7 @@ class DuplicateContentCrossRepoSubset extends Component {
       action: false
     },
     show: {
-        repo: true,        
+        repo: false,        
         fromLocale: true,
         toLocale: true,
         subset: true,
@@ -114,22 +114,19 @@ class DuplicateContentCrossRepoSubset extends Component {
     action.value != "" ? this.validate('action', true) : this.validate('action', false);
     this.setState({ action: action.value });
 
-    let showToLocale = true;
-    let showRepo = true;
+    let showToLocale = true;    
 
     switch (action.value) {      
 
       case "update_cross_repo_subset":
         showToLocale = false;
-        showRepo = false;
-        this.setState({ repo: "" })
         break;
       default:
         break;    
 
     }
 
-    this.setState({ show: Object.assign({}, this.state.show, { toLocale: showToLocale,  repo: showRepo })});         
+    this.setState({ show: Object.assign({}, this.state.show, { toLocale: showToLocale })});         
     this.setState({ zipFile: "" });  
   }
 

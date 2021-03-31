@@ -32,7 +32,7 @@ class DuplicateContentCrossRepo extends Component {
       action: false
     },
     show: {
-        repo: true,        
+        repo: false,        
         fromLocale: true,
         toLocale: true,
         providers: false,
@@ -103,21 +103,21 @@ class DuplicateContentCrossRepo extends Component {
     this.setState({ action: action.value });
 
     let showToLocale = true;
-    let showRepo = true;
+    
 
     switch (action.value) {      
 
-      case "update":
+      case "update_cross_repo":
         showToLocale = false;
-        showRepo = false;
-        this.setState({ repo: "" })
+    
+    
         break;
       default:
         break;    
 
     }
 
-    this.setState({ show: Object.assign({}, this.state.show, { toLocale: showToLocale,  repo: showRepo })});         
+    this.setState({ show: Object.assign({}, this.state.show, { toLocale: showToLocale })});         
     this.setState({ zipFile: "" });  
   }
 
